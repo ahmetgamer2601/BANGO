@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Anonim & Sohbet Dünyası - Akıllı Yanıt Veren Arkadaşlar</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Retro Style -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        retroBg: '#fbf8f3',
+                        retroCard: '#f4ece1',
+                        retroBorder: '#d9c9b4',
+                        retroAccent: '#b85d59',
+                        retroAccentHover: '#9e4b47',
+                        retroBlue: '#5c768d',
+                        retroGreen: '#6a8a73',
+                        retroText: '#3d3834',
+                        retroMuted: '#8c8275'
+                    },
+                    fontFamily: {
+                        retro: ['"Space Mono"', 'monospace'],
+                        pixel: ['"VT323"', 'monospace'],
+                        serif: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fbf8f3;
+            color: #3d3834;
+            font-family: 'Space Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f4ece1;
+            border-left: 2px solid #d9c9b4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b85d59;
+            border: 1px solid #f4ece1;
+        }
+        .retro-box {
+            background-color: #f4ece1;
+            border: 2px solid #d9c9b4;
+            box-shadow: 4px 4px 0px #d9c9b4;
+        }
+        .retro-btn {
+            background-color: #b85d59;
+            color: #fbf8f3;
+            border: 2px solid #3d3834;
+            box-shadow: 3px 3px 0px #3d3834;
+            transition: all 0.1s ease;
+        }
+        .retro-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #3d3834;
+            background-color: #9e4b47;
+        }
+        .retro-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #3d3834;
+        }
+        .retro-input {
+            background-color: #fbf8f3;
+            border: 2px solid #d9c9b4;
+            color: #3d3834;
+        }
+        .retro-input:focus {
+            outline: none;
+            border-color: #b85d59;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="border-b-4 border-retroBorder bg-retroCard px-4 py-3 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl font-pixel text-retroAccent">📼 RETRO.ANON+SMART</span>
+                <span class="text-xs bg-retroBorder text-retroText px-2 py-1 rounded font-mono">v4.0 Akıllı Botlar</span>
+            </div>
+            
+            <nav class="flex space-x-2">
+                <button onclick="switchTab('feed')" id="nav-feed" class="retro-btn px-4 py-1.5 text-sm font-bold">📜 Hikaye & Sesli Meme Duvarı</button>
+                <button onclick="switchTab('friends')" id="nav-friends" class="retro-btn px-4 py-1.5 text-sm font-bold bg-retroBlue hover:bg-[#4a5f72]">👥 Arkadaşlar (<span id="friend-count">0</span>)</button>
+                <button onclick="switchTab('dms')" id="nav-dms" class="retro-btn px-4 py-1.5 text-sm font-bold bg-retroGreen hover:bg-[#56705d]">💬 Özel Sesli DM</button>
+            </nav>
+
+            <div class="flex items-center space-x-2 text-xs bg-retroBg px-3 py-1.5 border border-retroBorder rounded">
+                <span class="text-retroMuted">Rumuzun:</span>
+                <span id="global-my-alias" class="font-bold text-retroAccent">Gizli Panda</span>
+                <button onclick="openGlobalAliasModal()" class="text-retroBlue hover:underline">[Değiştir]</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto flex-1 w-full p-4 md:p-6">
+
+        <!-- TAB 1: FEED -->
+        <div id="tab-feed" class="space-y-6">
+            
+            <!-- Post Creation Box -->
+            <div class="retro-box p-4 md:p-6 rounded-none">
+                <h2 class="text-lg font-bold text-retroAccent mb-3 font-serif italic">✨ Anonim Paylaşım & Yapay Zeka Sesli/Görsel Meme</h2>
+                <textarea id="new-post-content" rows="3" class="retro-input w-full p-3 text-sm rounded-none resize-none" placeholder="Bugün aklında neler var? Hikayen, itirafın..."></textarea>
+                
+                <div class="flex flex-wrap items-center justify-between gap-3 mt-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="aiAddMemeAndSound()" class="bg-retroBlue text-fbf8f3 border-2 border-retroText px-3 py-1.5 text-xs font-bold shadow-[2px_2px_0px_#3d3834] hover:bg-[#4a5f72] transition flex items-center gap-1">
+                            🤖 AI Görsel + Sesli Efekt Ekle
+                        </button>
+                        <select id="quick-meme-select" onchange="insertManualMeme()" class="retro-input text-xs py-1 px-2 rounded-none">
+                            <option value="">+ Hazır Görsel Meme</option>
+                            <option value="https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif">☕ Kahve Çöküşü (GIF)</option>
+                            <option value="https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif">🐱 Şok Kedi (GIF)</option>
+                            <option value="https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif">🔥 İnce Mizah (GIF)</option>
+                        </select>
+                        <select id="quick-audio-select" onchange="insertManualAudio()" class="retro-input text-xs py-1 px-2 rounded-none">
+                            <option value="">+ Hazır Ses Efekti</option>
+                            <option value="vine-boom">💥 Vine Boom (Bas Sesi)</option>
+                            <option value="laugh">😂 Komedi Gülüşü</option>
+                            <option value="sad-trombone">🎺 Hüsran Trompet</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div class="text-xs text-retroMuted">Yazar: <span id="post-author-preview" class="font-bold">Gizli Panda</span></div>
+                        <button onclick="submitNewPost()" class="retro-btn px-6 py-2 text-sm font-bold">Paylaş 🚀</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed Filters -->
+            <div class="flex justify-between items-center bg-retroCard p-3 border border-retroBorder">
+                <div class="text-sm font-bold">📜 Akış Duvarı (<span id="post-count">0</span> Paylaşım)</div>
+                <input type="text" id="feed-search" oninput="renderFeed()" placeholder="Kelime veya meme ara..." class="retro-input text-xs px-3 py-1 w-48 sm:w-64">
+            </div>
+
+            <!-- Posts List -->
+            <div id="posts-container" class="space-y-4">
+                <!-- Posts populated by JS -->
+            </div>
+        </div>
+
+        <!-- TAB 2: FRIENDS -->
+        <div id="tab-friends" class="hidden space-y-6">
+            <div class="retro-box p-6">
+                <h2 class="text-xl font-bold text-retroBlue mb-2 font-serif">👥 Arkadaş Yönetimi & Keşif</h2>
+                <p class="text-xs text-retroMuted mb-4">Sitedeki diğer anonim yazarları arkadaş olarak ekle, akıllı sohbet arkadaşlarınla dertleş!</p>
+                
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="new-friend-name" placeholder="Arkadaşın tam rumuzu (örn: Gece Kuşu)" class="retro-input flex-1 px-3 py-2 text-sm">
+                    <button onclick="addFriend()" class="retro-btn bg-retroBlue hover:bg-[#4a5f72] px-4 py-2 text-sm font-bold">+ Arkadaş Ekle</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="friends-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DMs -->
+        <div id="tab-dms" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[650px]">
+                <!-- Chat List Sidebar -->
+                <div class="retro-box p-4 flex flex-col overflow-hidden">
+                    <h3 class="font-bold text-sm mb-3 pb-2 border-b border-retroBorder text-retroGreen">💬 Sohbet Odalarım (Akıllı Botlar)</h3>
+                    <div id="chat-list-sidebar" class="flex-1 overflow-y-auto space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Chat Active Window -->
+                <div id="chat-window-container" class="retro-box md:col-span-2 flex flex-col overflow-hidden bg-retroBg">
+                    <div class="p-4 bg-retroCard border-b border-retroBorder flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-retroGreen inline-block"></span>
+                            <h3 id="active-chat-title" class="font-bold text-sm">Bir sohbet seçin</h3>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openChatSettings()" class="text-xs bg-retroBorder px-2 py-1 hover:bg-[#c9b8a3] font-bold">⚙️ Sohbet Ayarları</button>
+                        </div>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#fbf8f3]">
+                        <div class="text-center text-retroMuted text-xs my-auto">Sol taraftan bir arkadaş seçerek özel sohbete başlayabilirsin. Yazdıklarına akıllıca yanıt verecekler!</div>
+                    </div>
+
+                    <!-- Sticker / Meme & Audio Picker Popup -->
+                    <div id="sticker-picker" class="hidden bg-retroCard border-t-2 border-retroBorder p-3 space-y-2 max-h-48 overflow-y-auto">
+                        <div class="text-[11px] font-bold text-retroMuted">Görsel Meme & Stickerlar:</div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="sendSticker('https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif')" class="p-1 hover:bg-retroBorder border border-retroBorder flex justify-center"><img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif" class="h-10 object-contain"></button>
+                            <button onclick="sendSticker('https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif')" class="p-1 hover:bg-retroBorder border border-retroBorder flex justify-center"><img src="https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif" class="h-10 object-contain"></button>
+                            <button onclick="sendSticker('https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif')" class="p-1 hover:bg-retroBorder border border-retroBorder flex justify-center"><img src="https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif" class="h-10 object-contain"></button>
+                            <button onclick="sendSticker('https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif')" class="p-1 hover:bg-retroBorder border border-retroBorder flex justify-center"><img src="https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif" class="h-10 object-contain"></button>
+                        </div>
+                        <div class="text-[11px] font-bold text-retroMuted pt-1">Ses Efekti / Sesli Meme Gönder:</div>
+                        <div class="flex gap-2">
+                            <button onclick="sendAudioMessage('vine-boom')" class="text-xs bg-retroAccent text-white px-2 py-1 font-bold">💥 Vine Boom</button>
+                            <button onclick="sendAudioMessage('laugh')" class="text-xs bg-retroBlue text-white px-2 py-1 font-bold">😂 Gülüş</button>
+                            <button onclick="sendAudioMessage('sad-trombone')" class="text-xs bg-retroBorder text-retroText px-2 py-1 font-bold">🎺 Hüsran</button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input Bar -->
+                    <div class="p-3 bg-retroCard border-t border-retroBorder flex items-center space-x-2">
+                        <button onclick="toggleStickerPicker()" class="retro-btn bg-retroBorder text-retroText px-2.5 py-2 text-xs font-bold" title="Sticker ve Sesli Meme Ekle">🎵/🖼️</button>
+                        <input type="text" id="chat-input" onkeypress="handleChatKeypress(event)" placeholder="Özel mesaj yaz (akıllı arkadaş yanıt verecek)..." class="retro-input flex-1 px-3 py-2 text-sm rounded-none" disabled>
+                        <button onclick="sendChatMessage()" id="chat-send-btn" class="retro-btn bg-retroGreen hover:bg-[#56705d] px-4 py-2 text-sm font-bold" disabled>Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Global Alias Modal -->
+    <div id="modal-alias" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 hidden">
+        <div class="retro-box bg-retroCard p-6 max-w-sm w-full mx-4 space-y-4">
+            <h3 class="font-bold text-lg text-retroAccent">Rumuzunu Değiştir</h3>
+            <p class="text-xs text-retroMuted">Tüm duvar paylaşımlarında ve arkadaş listelerinde görünecek yeni anonim ismini gir.</p>
+            <input type="text" id="modal-alias-input" class="retro-input w-full p-2 text-sm" placeholder="Örn: Nostaljik Baykuş">
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeGlobalAliasModal()" class="px-3 py-1.5 text-xs bg-retroBorder font-bold">İptal</button>
+                <button onclick="saveGlobalAlias()" class="retro-btn px-4 py-1.5 text-xs font-bold">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Settings Modal -->
+    <div id="modal-chat-settings" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 hidden">
+        <div class="retro-box bg-retroCard p-6 max-w-md w-full mx-4 space-y-4">
+            <h3 class="font-bold text-lg text-retroGreen">Sohbet Ayarları</h3>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold mb-1">Bu Sohbetteki Rumuzun:</label>
+                    <input type="text" id="chat-custom-nickname" class="retro-input w-full p-2 text-sm" placeholder="Sadece bu sohbette görünecek isim">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">Sohbet Teması:</label>
+                    <select id="chat-theme-select" class="retro-input w-full p-2 text-sm">
+                        <option value="retro">Klasik Retro Pastel (#fbf8f3)</option>
+                        <option value="midnight">Gece Yarısı Koyu (#2b2d31)</option>
+                        <option value="sepia">Nostaljik Sepya (#efe2d0)</option>
+                        <option value="mint">Mint Yeşili (#e3efe8)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeChatSettings()" class="px-3 py-1.5 text-xs bg-retroBorder font-bold">İptal</button>
+                <button onclick="saveChatSettings()" class="retro-btn bg-retroGreen px-4 py-1.5 text-xs font-bold">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t-2 border-retroBorder bg-retroCard py-4 text-center text-xs text-retroMuted mt-auto">
+        <p>Retro Anonim & Sohbet Dünyası &bull; Akıllı Yanıt Veren Arkadaş Sistemi</p>
+    </footer>
+
+    <!-- Audio Synthesizer -->
+    <script>
+        function playSoundEffect(type) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (type === 'vine-boom') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'laugh') {
+                    [0, 0.1, 0.2, 0.3].forEach((delay, idx) => {
+                        setTimeout(() => {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(400 + (idx * 80), audioCtx.currentTime);
+                            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            osc.start();
+                            osc.stop(audioCtx.currentTime + 0.08);
+                        }, delay * 1000);
+                    });
+                } else if (type === 'sad-trombone') {
+                    const notes = [220, 207.65, 196, 185];
+                    notes.forEach((freq, idx) => {
+                        setTimeout(() => {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            osc.start();
+                            osc.stop(audioCtx.currentTime + 0.25);
+                        }, idx * 250);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio Context issue:", e);
+            }
+        }
+    </script>
+
+    <!-- Main Application Script with Contextual Bot Engine -->
+    <script>
+        const STORAGE_KEYS = {
+            MY_ALIAS: 'retro_my_alias_v4',
+            POSTS: 'retro_posts_v4',
+            FRIENDS: 'retro_friends_v4',
+            DMS: 'retro_dms_v4',
+            CHAT_SETTINGS: 'retro_chat_settings_v4'
+        };
+
+        let state = {
+            myAlias: localStorage.getItem(STORAGE_KEYS.MY_ALIAS) || 'Gizli Panda',
+            posts: JSON.parse(localStorage.getItem(STORAGE_KEYS.POSTS)) || [
+                {
+                    id: 1,
+                    author: 'Gece Kuşu',
+                    content: 'Sabahlamanın sonuna geldik ve sistem kafayı yedi. <img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif" class="inline-block h-8 mx-1 align-middle rounded border border-retroBorder"> <span onclick="playSoundEffect(\'vine-boom\')" class="cursor-pointer bg-retroAccent text-white px-2 py-0.5 rounded text-xs font-bold inline-flex items-center gap-1">🔊 [Ses: Vine Boom]</span>',
+                    time: '15 dk önce',
+                    likes: 8,
+                    liked: false,
+                    comments: [
+                        { author: 'Sessiz Yolcu', text: 'Ses efekti olaya efsane hava katmış! 💥' }
+                    ]
+                }
+            ],
+            friends: JSON.parse(localStorage.getItem(STORAGE_KEYS.FRIENDS)) || ['Gece Kuşu', 'Sessiz Yolcu', 'Kahve Delisi'],
+            dms: JSON.parse(localStorage.getItem(STORAGE_KEYS.DMS)) || {
+                'Gece Kuşu': [
+                    { sender: 'Gece Kuşu', text: 'Selam! Naber dostum?', time: 'Dün' }
+                ]
+            },
+            chatSettings: JSON.parse(localStorage.getItem(STORAGE_KEYS.CHAT_SETTINGS)) || {},
+            activeChat: null
+        };
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEYS.MY_ALIAS, state.myAlias);
+            localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(state.posts));
+            localStorage.setItem(STORAGE_KEYS.FRIENDS, JSON.stringify(state.friends));
+            localStorage.setItem(STORAGE_KEYS.DMS, JSON.stringify(state.dms));
+            localStorage.setItem(STORAGE_KEYS.CHAT_SETTINGS, JSON.stringify(state.chatSettings));
+            updateUICounters();
+        }
+
+        function updateUICounters() {
+            document.getElementById('global-my-alias').innerText = state.myAlias;
+            document.getElementById('post-author-preview').innerText = state.myAlias;
+            document.getElementById('friend-count').innerText = state.friends.length;
+            document.getElementById('post-count').innerText = state.posts.length;
+        }
+
+        function switchTab(tabId) {
+            ['feed', 'friends', 'dms'].forEach(id => {
+                document.getElementById(`tab-${id}`).classList.add('hidden');
+                document.getElementById(`nav-${id}`).classList.remove('ring-2', 'ring-retroText');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.add('ring-2', 'ring-retroText');
+
+            if (tabId === 'friends') renderFriends();
+            if (tabId === 'dms') renderChatSidebar();
+        }
+
+        // --- GLOBAL ALIAS MODAL ---
+        function openGlobalAliasModal() {
+            document.getElementById('modal-alias-input').value = state.myAlias;
+            document.getElementById('modal-alias').classList.remove('hidden');
+        }
+        function closeGlobalAliasModal() {
+            document.getElementById('modal-alias').classList.add('hidden');
+        }
+        function saveGlobalAlias() {
+            const val = document.getElementById('modal-alias-input').value.trim();
+            if (val) {
+                state.myAlias = val;
+                saveState();
+                closeGlobalAliasModal();
+                renderFeed();
+            }
+        }
+
+        // --- AI & MANUAL MEME / AUDIO GENERATION ---
+        function aiAddMemeAndSound() {
+            const textarea = document.getElementById('new-post-content');
+            const memes = [
+                { img: 'https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif', sound: 'vine-boom', label: 'Vine Boom' },
+                { img: 'https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif', sound: 'laugh', label: 'Komedi Gülüşü' },
+                { img: 'https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif', sound: 'sad-trombone', label: 'Hüsran Trompet' }
+            ];
+            const chosen = memes[Math.floor(Math.random() * memes.length)];
+            
+            textarea.value += ` <img src="${chosen.img}" class="inline-block h-8 mx-1 align-middle rounded border border-retroBorder"> <span onclick="playSoundEffect('${chosen.sound}')" class="cursor-pointer bg-retroAccent text-white px-2 py-0.5 rounded text-xs font-bold inline-flex items-center gap-1">🔊 [Ses: ${chosen.label}]</span>`;
+            textarea.focus();
+        }
+
+        function insertManualMeme() {
+            const select = document.getElementById('quick-meme-select');
+            const url = select.value;
+            if (!url) return;
+            const textarea = document.getElementById('new-post-content');
+            textarea.value += ` <img src="${url}" class="inline-block h-8 mx-1 align-middle rounded border border-retroBorder"> `;
+            select.value = '';
+            textarea.focus();
+        }
+
+        function insertManualAudio() {
+            const select = document.getElementById('quick-audio-select');
+            const type = select.value;
+            if (!type) return;
+            const labels = { 'vine-boom': 'Vine Boom', 'laugh': 'Komedi Gülüşü', 'sad-trombone': 'Hüsran Trompet' };
+            const textarea = document.getElementById('new-post-content');
+            textarea.value += ` <span onclick="playSoundEffect('${type}')" class="cursor-pointer bg-retroAccent text-white px-2 py-0.5 rounded text-xs font-bold inline-flex items-center gap-1">🔊 [Ses: ${labels[type]}]</span> `;
+            select.value = '';
+            textarea.focus();
+        }
+
+        function submitNewPost() {
+            const content = document.getElementById('new-post-content').value.trim();
+            if (!content) return;
+
+            const newPost = {
+                id: Date.now(),
+                author: state.myAlias,
+                content: content,
+                time: 'Az önce',
+                likes: 0,
+                liked: false,
+                comments: []
+            };
+
+            state.posts.unshift(newPost);
+            document.getElementById('new-post-content').value = '';
+            saveState();
+            renderFeed();
+        }
+
+        function toggleLike(postId) {
+            const post = state.posts.find(p => p.id === postId);
+            if (post) {
+                post.liked ? (post.likes--, post.liked = false) : (post.likes++, post.liked = true);
+                saveState();
+                renderFeed();
+            }
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = state.posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push({ author: state.myAlias, text: text });
+                input.value = '';
+                saveState();
+                renderFeed();
+            }
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('posts-container');
+            const search = document.getElementById('feed-search').value.toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = state.posts.filter(p => p.content.toLowerCase().includes(search) || p.author.toLowerCase().includes(search));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="retro-box p-6 text-center text-retroMuted">Hiç paylaşım bulunamadı.</div>`;
+                return;
+            }
+
+            filtered.forEach(post => {
+                const isMyFriend = state.friends.includes(post.author);
+                const isMe = post.author === state.myAlias;
+
+                let commentsHtml = '';
+                post.comments.forEach(c => {
+                    commentsHtml += `
+                        <div class="bg-retroBg p-2 text-xs border-l-2 border-retroAccent my-1">
+                            <span class="font-bold text-retroAccent">${c.author}:</span> ${c.text}
+                        </div>
+                    `;
+                });
+
+                const postEl = document.createElement('div');
+                postEl.className = 'retro-box p-4 md:p-5 space-y-3';
+                postEl.innerHTML = `
+                    <div class="flex justify-between items-center text-xs border-b border-retroBorder pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-retroBlue">${post.author}</span>
+                            <span class="text-retroMuted">&bull; ${post.time}</span>
+                        </div>
+                        ${!isMe && !isMyFriend ? `<button onclick="quickAddFriend('${post.author}')" class="text-xs bg-retroBorder px-2 py-0.5 hover:bg-[#d4c3ac] font-bold">+ Arkadaş Ekle</button>` : ''}
+                    </div>
+                    <div class="text-sm leading-relaxed text-retroText">
+                        ${post.content}
+                    </div>
+                    <div class="flex items-center space-x-4 text-xs pt-2 border-t border-retroBorder text-retroMuted">
+                        <button onclick="toggleLike(${post.id})" class="hover:text-retroAccent font-bold ${post.liked ? 'text-retroAccent' : ''}">
+                            ❤️ ${post.likes} Beğeni
+                        </button>
+                        <span>💬 Yorumlar (${post.comments.length})</span>
+                    </div>
+                    <div class="space-y-1 pt-2">
+                        ${commentsHtml}
+                        <div class="flex gap-2 mt-2">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Yorum veya sesli meme yaz..." class="retro-input flex-1 px-2 py-1 text-xs">
+                            <button onclick="addComment(${post.id})" class="retro-btn px-3 py-1 text-xs font-bold">Yaz</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(postEl);
+            });
+        }
+
+        // --- FRIENDS ---
+        function addFriend() {
+            const input = document.getElementById('new-friend-name');
+            const name = input.value.trim();
+            if (!name) return;
+            if (name === state.myAlias) { alert("Kendini ekleyemezsin!"); return; }
+            if (!state.friends.includes(name)) {
+                state.friends.push(name);
+                input.value = '';
+                saveState();
+                renderFriends();
+            } else { alert("Zaten arkadaş listende."); }
+        }
+
+        function quickAddFriend(name) {
+            if (!state.friends.includes(name) && name !== state.myAlias) {
+                state.friends.push(name);
+                saveState();
+                renderFeed();
+            }
+        }
+
+        function removeFriend(name) {
+            state.friends = state.friends.filter(f => f !== name);
+            saveState();
+            renderFriends();
+        }
+
+        function startChatWith(name) {
+            switchTab('dms');
+            selectChat(name);
+        }
+
+        function renderFriends() {
+            const grid = document.getElementById('friends-grid');
+            grid.innerHTML = '';
+            if (state.friends.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center text-retroMuted text-xs py-8">Henüz arkadaşın yok.</div>`;
+                return;
+            }
+            state.friends.forEach(friend => {
+                const card = document.createElement('div');
+                card.className = 'bg-retroBg p-3 border border-retroBorder flex justify-between items-center';
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-retroGreen"></span>
+                        <span class="font-bold text-sm">${friend}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="startChatWith('${friend}')" class="retro-btn bg-retroGreen px-3 py-1 text-xs font-bold">DM Sohbet</button>
+                        <button onclick="removeFriend('${friend}')" class="text-xs bg-retroBorder px-2 py-1 hover:bg-red-200 text-red-800 font-bold">Sil</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- DMs & CONTEXTUAL BOT REPLY ENGINE ---
+        function generateContextualReply(userMsgText, friendName) {
+            const text = userMsgText.toLowerCase();
+            
+            // Keyword Analysis & Intent Matching
+            if (text.includes('selam') || text.includes('merhaba') || text.includes('hey') || text.includes('naber')) {
+                const greetings = [
+                    "Selamlar! Bugün sistemler yerinde mi?",
+                    "Hey! Kahven hazır mı yoksa hala uykulu musun?",
+                    "Selam dostum, ortamlarda nasılsın bakalım?"
+                ];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            }
+            
+            if (text.includes('kod') || text.includes('yazılım') || text.includes('bug') || text.includes('hata') || text.includes('proje')) {
+                const techReplies = [
+                    "Kod yazarken kahve dökülmediyse o yazılımda bug vardır! <img src='https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif' class='inline-block h-6 mx-1 align-middle rounded'>",
+                    "StackOverflow'a bakmadan sabaha çıkamayacağız galiba 😅",
+                    "Yazılım dediğin şey çalışan kodu ellememektir! Kolay gelsin."
+                ];
+                return techReplies[Math.floor(Math.random() * techReplies.length)];
+            }
+
+            if (text.includes('kahve') || text.includes('çay') || text.includes('yemek') || text.includes('aç')) {
+                const foodReplies = [
+                    "Bana da bir bardak sert kahve ısmarla o zaman! <img src='https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif' class='inline-block h-6 mx-1 align-middle rounded'>",
+                    "Kahvesiz kod derleme hatası veriyorum resmen.",
+                    "Hemen bir mola verelim, ekran başına kilitlendik kaldık."
+                ];
+                return foodReplies[Math.floor(Math.random() * foodReplies.length)];
+            }
+
+            if (text.includes('üzgün') || text.includes('moral') || text.includes('kötü') || text.includes('sıktı') || text.includes('yoruldu')) {
+                const sadReplies = [
+                    "Hadi ama kafaya takma! Baksana şuna: <span onclick=\"playSoundEffect('sad-trombone')\" class=\"cursor-pointer bg-retroAccent text-white px-2 py-0.5 rounded text-xs font-bold inline-flex items-center gap-1\">🔊 [Ses: Hüsran Trompet]</span>",
+                    "Geçecek dostum, hep böyle gidecek değil ya! Kafayı dağıtmak için bir meme atıyorum.",
+                    "Yorulduysan sistemi kapatıp dinlenmelisin. Anonim duvar burada bekler."
+                ];
+                return sadReplies[Math.floor(Math.random() * sadReplies.length)];
+            }
+
+            if (text.includes('haha') || text.includes('komik') || text.includes('güzel') || text.includes('lol')) {
+                const laughReplies = [
+                    "Aynen öyle! <span onclick=\"playSoundEffect('laugh')\" class=\"cursor-pointer bg-retroAccent text-white px-2 py-0.5 rounded text-xs font-bold inline-flex items-center gap-1\">🔊 [Ses: Komedi Gülüşü]</span>",
+                    "Kahkahalarımız bol olsun hocam! <img src='https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif' class='inline-block h-6 mx-1 align-middle rounded'>",
+                    "Mizah seviyen yine tavan yapmış bakıyorum :)"
+                ];
+                return laughReplies[Math.floor(Math.random() * laughReplies.length)];
+            }
+
+            // Default fallback contextual replies if no keyword matches
+            const genericReplies = [
+                `"${userMsgText}" dedin ama bu konuyu derinlemesine incelemek lazım! <img src='https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif' class='inline-block h-6 mx-1 align-middle rounded'>`,
+                "Çok haklısın, buna benzer bir anım geçen hafta başıma gelmişti.",
+                `Bunu ${friendName} olarak not aldım, güzel noktaya değindin!`,
+                "Kesinlikle katılıyorum. Başka neler planlıyorsun?"
+            ];
+            return genericReplies[Math.floor(Math.random() * genericReplies.length)];
+        }
+
+        function renderChatSidebar() {
+            const sidebar = document.getElementById('chat-list-sidebar');
+            sidebar.innerHTML = '';
+            if (state.friends.length === 0) {
+                sidebar.innerHTML = `<div class="text-xs text-retroMuted text-center p-4">Arkadaş eklemelisin.</div>`;
+                return;
+            }
+            state.friends.forEach(friend => {
+                const isActive = state.activeChat === friend;
+                const lastMsg = state.dms[friend] && state.dms[friend].length > 0 ? state.dms[friend][state.dms[friend].length - 1].text : 'Sohbet yok';
+                
+                const item = document.createElement('div');
+                item.className = `p-3 border cursor-pointer transition ${isActive ? 'bg-retroGreen text-white border-retroText shadow' : 'bg-retroBg border-retroBorder hover:bg-[#eee3d2]'}`;
+                item.onclick = () => selectChat(friend);
+                item.innerHTML = `
+                    <div class="font-bold text-xs flex justify-between">
+                        <span>${friend}</span>
+                        <span class="text-[10px] opacity-70">Akıllı Bot</span>
+                    </div>
+                    <div class="text-[11px] truncate mt-1 opacity-80">${lastMsg.replace(/<[^>]*>?/gm, '[Medya]')}</div>
+                `;
+                sidebar.appendChild(item);
+            });
+        }
+
+        function selectChat(friendName) {
+            state.activeChat = friendName;
+            renderChatSidebar();
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send-btn').disabled = false;
+            applyChatThemeAndSettings();
+            renderChatMessages();
+        }
+
+        function applyChatThemeAndSettings() {
+            const container = document.getElementById('chat-window-container');
+            const title = document.getElementById('active-chat-title');
+            title.innerText = `${state.activeChat} ile Akıllı Sesli DM Sohbeti`;
+
+            const settings = (state.chatSettings && state.chatSettings[state.activeChat]) || {};
+            const theme = settings.theme || 'retro';
+
+            container.className = "retro-box md:col-span-2 flex flex-col overflow-hidden ";
+            if (theme === 'midnight') container.classList.add('bg-[#2b2d31]', 'text-[#f2f3f5]');
+            else if (theme === 'sepia') container.classList.add('bg-[#efe2d0]', 'text-[#3d3834]');
+            else if (theme === 'mint') container.classList.add('bg-[#e3efe8]', 'text-[#2c3e35]');
+            else container.classList.add('bg-retroBg', 'text-retroText');
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            if (!state.activeChat) return;
+
+            const messages = state.dms[state.activeChat] || [];
+            if (messages.length === 0) {
+                container.innerHTML = `<div class="text-center text-retroMuted text-xs my-auto">Henüz mesaj yok. Bir şeyler yazarak arkadaşının akıllı yanıt vermesini sağla!</div>`;
+                return;
+            }
+
+            const settings = (state.chatSettings && state.chatSettings[state.activeChat]) || {};
+            const myCustomNick = settings.nickname || state.myAlias;
+
+            messages.forEach(msg => {
+                const isMe = msg.sender === state.myAlias || msg.sender === myCustomNick;
+                const displayName = isMe ? myCustomNick : state.activeChat;
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`;
+                msgDiv.innerHTML = `
+                    <div class="text-[10px] text-retroMuted font-bold">${displayName} &bull; ${msg.time}</div>
+                    <div class="p-2.5 max-w-xs md:max-w-md text-xs border border-retroBorder shadow-xs ${isMe ? 'bg-retroAccent text-fbf8f3' : 'bg-retroCard text-retroText'}">
+                        ${msg.text}
+                    </div>
+                `;
+                container.appendChild(msgDiv);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !state.activeChat) return;
+
+            if (!state.dms[state.activeChat]) state.dms[state.activeChat] = [];
+            
+            // User Message
+            state.dms[state.activeChat].push({
+                sender: state.myAlias,
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            input.value = '';
+            saveState();
+            renderChatMessages();
+            renderChatSidebar();
+
+            // Trigger Contextual Bot Reply after 1 second delay
+            const currentFriend = state.activeChat;
+            setTimeout(() => {
+                if (state.activeChat === currentFriend) {
+                    const botReplyText = generateContextualReply(text, currentFriend);
+                    state.dms[currentFriend].push({
+                        sender: currentFriend,
+                        text: botReplyText,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    });
+                    saveState();
+                    renderChatMessages();
+                    renderChatSidebar();
+                }
+            }, 1000);
+        }
+
+        function handleChatKeypress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function toggleStickerPicker() {
+            document.getElementById('sticker-picker').classList.toggle('hidden');
+        }
+
+        function sendSticker(url) {
+            if (!state.activeChat) return;
+            if (!state.dms[state.activeChat]) state.dms[state.activeChat] = [];
+
+            const stickerHtml = `<img src="${url}" class="h-20 object-contain rounded border border-retroBorder">`;
+            state.dms[state.activeChat].push({
+                sender: state.myAlias,
+                text: stickerHtml,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            toggleStickerPicker();
+            saveState();
+            renderChatMessages();
+            renderChatSidebar();
+
+            // Bot replies to sticker as well
+            const currentFriend = state.activeChat;
+            setTimeout(() => {
+                if (state.activeChat === currentFriend) {
+                    state.dms[currentFriend].push({
+                        sender: currentFriend,
+                        text: "Efsane sticker'mış! <img src='https://media.giphy.com/media/9uIZj9QfK0zTq/giphy.gif' class='inline-block h-6 mx-1 align-middle rounded'>",
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    });
+                    saveState();
+                    renderChatMessages();
+                    renderChatSidebar();
+                }
+            }, 1000);
+        }
+
+        function sendAudioMessage(type) {
+            if (!state.activeChat) return;
+            if (!state.dms[state.activeChat]) state.dms[state.activeChat] = [];
+
+            const labels = { 'vine-boom': 'Vine Boom', 'laugh': 'Komedi Gülüşü', 'sad-trombone': 'Hüsran Trompet' };
+            const audioHtml = `<span onclick="playSoundEffect('${type}')" class="cursor-pointer bg-retroAccent text-white px-2 py-1 rounded text-xs font-bold inline-flex items-center gap-1 shadow">🔊 [Sesli Meme: ${labels[type]}]</span>`;
+
+            state.dms[state.activeChat].push({
+                sender: state.myAlias,
+                text: audioHtml,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            toggleStickerPicker();
+            saveState();
+            renderChatMessages();
+            renderChatSidebar();
+            playSoundEffect(type);
+
+            // Bot reacts to audio message
+            const currentFriend = state.activeChat;
+            setTimeout(() => {
+                if (state.activeChat === currentFriend) {
+                    state.dms[currentFriend].push({
+                        sender: currentFriend,
+                        text: `Ses efektini duydum! <span onclick="playSoundEffect('laugh')" class="cursor-pointer bg-retroBlue text-white px-1.5 py-0.5 rounded text-[10px] font-bold">🔊 [Gülüş]</span>`,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    });
+                    saveState();
+                    renderChatMessages();
+                    renderChatSidebar();
+                }
+            }, 1200);
+        }
+
+        function openChatSettings() {
+            if (!state.activeChat) return;
+            const settings = (state.chatSettings && state.chatSettings[state.activeChat]) || {};
+            document.getElementById('chat-custom-nickname').value = settings.nickname || state.myAlias;
+            document.getElementById('chat-theme-select').value = settings.theme || 'retro';
+            document.getElementById('modal-chat-settings').classList.remove('hidden');
+        }
+
+        function closeChatSettings() {
+            document.getElementById('modal-chat-settings').classList.add('hidden');
+        }
+
+        function saveChatSettings() {
+            if (!state.activeChat) return;
+            const nickname = document.getElementById('chat-custom-nickname').value.trim();
+            const theme = document.getElementById('chat-theme-select').value;
+
+            if (!state.chatSettings) state.chatSettings = {};
+            state.chatSettings[state.activeChat] = { nickname: nickname || state.myAlias, theme: theme };
+
+            saveState();
+            closeChatSettings();
+            applyChatThemeAndSettings();
+            renderChatMessages();
+        }
+
+        window.onload = function() {
+            updateUICounters();
+            renderFeed();
+        };
+    </script>
+</body>
+</html>
